@@ -10,6 +10,10 @@ A static, dependency-free todo app: `index.html` + `style.css` + `app.js`. No bu
 
 Open `index.html` directly in a browser (double-click, or `start index.html` in PowerShell). No server is required.
 
+## Deployment
+
+`main` is published by GitHub Pages at https://smartin1899.github.io/todo-app/. Pages serves files with `Cache-Control: max-age=600`, so browsers can mix a new `index.html` with stale CSS/JS. `index.html` references `style.css?v=N` and `app.js?v=N` for cache-busting: **bump `N` in `index.html` whenever `style.css` or `app.js` changes.**
+
 ## Architecture
 
 - **State**: `app.js` keeps `tasksByDate` (all tasks, keyed by local date `"YYYY-MM-DD"` → `[{ id, text, done }]`) plus `tasks`, a working copy of the selected date's list. `selectedDate` is what the task list shows; `viewYear`/`viewMonth` is the month the calendar displays, and they can differ (browsing months doesn't change the selection).
