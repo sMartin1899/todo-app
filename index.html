@@ -10,13 +10,28 @@
   <main class="app">
     <h1>To-Do</h1>
 
+    <section class="calendar" aria-label="Calendar">
+      <div class="calendar-header">
+        <button id="prev-month" type="button" class="nav-btn" aria-label="Previous month">‹</button>
+        <h2 id="month-label" aria-live="polite"></h2>
+        <button id="next-month" type="button" class="nav-btn" aria-label="Next month">›</button>
+        <button id="today-btn" type="button" class="today-btn">Today</button>
+      </div>
+      <div class="weekdays" aria-hidden="true">
+        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <h2 id="selected-date" class="selected-date"></h2>
+
     <form id="task-form" class="task-form">
       <input id="task-input" type="text" placeholder="Add a task…" autocomplete="off" aria-label="New task" required>
       <button type="submit">Add</button>
     </form>
 
     <ul id="task-list" class="task-list"></ul>
-    <p id="empty-msg" class="empty">No tasks yet.</p>
+    <p id="empty-msg" class="empty">No tasks for this day.</p>
   </main>
 
   <script src="app.js"></script>

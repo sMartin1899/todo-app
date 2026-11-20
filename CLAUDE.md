@@ -12,8 +12,9 @@ Open `index.html` directly in a browser (double-click, or `start index.html` in 
 
 ## Architecture
 
-- **State**: `app.js` holds a single in-memory `tasks` array of `{ id, text, done }`. It is the source of truth; the DOM is always rebuilt from it.
-- **Persistence**: the array is serialized to `localStorage` under the key `todo-app-tasks`. `loadTasks()`/`saveTasks()` wrap storage access in try/catch so the app still works (in memory only) when storage is unavailable or corrupt. Changing the task shape or storage key will orphan existing users' saved data unless migrated.
-- **Update cycle**: every mutation follows `mutate tasks → saveTasks() → render()`. `render()` clears and re-creates the whole `<ul id="task-list">`; there is no incremental DOM diffing.
+- **State**: `app.js` keeps `tasksByDate` (all tasks, keyed by local date `"YYYY-MM-DD"` → `[{ id, text, done }]`) plus `tasks`, a working copy of the selected date's list. `selectedDate` is what the task list shows; `viewYear`/`viewMonth` is the month the calendar displays, and they can differ (browsing months doesn't change the selection).
+- **Date keys**: always build keys with `toDateKey()` (local time). Don't use `toISOString()` — it's UTC and shifts the day near midnight.
+- **Persistence**: `tasksByDate` is serialized to `localStorage` under `todo-app-tasks-by-date`. `saveTasks()` writes `tasks` back into `tasksByDate[selectedDate]` (deleting the key when empty) and then persists. `selectDate()` must call `saveTasks()` before switching dates — that is a stated requirement. Storage access is wrapped in try/catch so the app still works in memory only. The old pre-calendar key `todo-app-tasks` is deliberately deleted on load (the user chose to discard undated tasks rather than migrate them).
+- **Update cycle**: every mutation follows `mutate tasks → saveTasks() → render()`. `render()` = `renderCalendar()` (month grid; Monday-first; dots on days with tasks, faded when all done) + `renderTasks()`, each fully rebuilding its DOM; there is no incremental diffing.
 - **Events**: toggle and delete use event delegation on `#task-list` (`change` for checkboxes, `click` for `.delete-btn`), resolving the task via the `data-id` on the parent `li.task`. New per-item controls should follow the same pattern rather than attaching listeners inside `render()`.
 - **Styling hooks**: completed tasks get the `done` class on `li.task`; the strikethrough is applied by `.task.done .task-text` in `style.css`. Task text is inserted with `textContent` (never `innerHTML`) to avoid HTML injection.
